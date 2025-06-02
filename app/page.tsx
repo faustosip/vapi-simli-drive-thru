@@ -1,4 +1,4 @@
-import { dynamic as nextDynamic } from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic';
