@@ -5,7 +5,9 @@ services:
     image: node:18-alpine
     working_dir: /app
     ports:
-      - "3000:3000"
+      - target: 3000
+        published: 3000
+        mode: ingress
     environment:
       # VAPI Configuration
       - NEXT_PUBLIC_VAPI_PUBLIC_KEY=${NEXT_PUBLIC_VAPI_PUBLIC_KEY}
@@ -24,14 +26,15 @@ services:
       - app-data:/app
     command: >
       sh -c "
+        echo '🚀 Starting VAPI Simli Drive-Thru Application...' &&
         if [ ! -f package.json ]; then
-          echo '🚀 First time setup - cloning repository...'
-          apk add --no-cache git &&
+          echo '📦 First time setup - installing dependencies...' &&
+          apk add --no-cache git curl wget &&
           git clone https://github.com/faustosip/vapi-simli-drive-thru.git . &&
           npm install &&
           npm run build
         fi &&
-        echo '✅ Starting application...' &&
+        echo '✅ Starting application on port 3000...' &&
         npm start
       "
     deploy:
@@ -51,20 +54,16 @@ services:
           memory: 512M
         reservations:
           memory: 256M
+      placement:
+        constraints:
+          - node.role == manager
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
-    networks:
-      - vapi-network
+      start_period: 120s
 
 volumes:
   app-data:
     driver: local
-
-networks:
-  vapi-network:
-    driver: overlay
-    attachable: true
