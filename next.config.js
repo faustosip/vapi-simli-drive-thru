@@ -11,13 +11,12 @@ const nextConfig = {
     unoptimized: true,
   },
   
-  // Disable static export to avoid SSR issues
-  trailingSlash: false,
+  // DISABLE static page generation to avoid SSR errors
+  generateEtags: false,
   
-  // Skip static optimization for pages with SSR issues
+  // Force dynamic rendering
   experimental: {
-    skipTrailingSlashRedirect: true,
-    skipMiddlewareUrlNormalize: true,
+    forceSwcTransforms: true,
   },
   
   // Environment variables validation
