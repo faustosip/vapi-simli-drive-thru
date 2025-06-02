@@ -19,7 +19,7 @@ services:
       - NEXT_PUBLIC_SIMLI_FACE_ID=${NEXT_PUBLIC_SIMLI_FACE_ID}
       ## Server Configuration
       - NEXT_PUBLIC_BASE_URL=https://sophia.faustoparedesia.com
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=3000
       - HOSTNAME=0.0.0.0
     command: >
@@ -46,7 +46,7 @@ services:
           npm run build
         fi &&
         echo '✅ Iniciando servidor en puerto 3000...' &&
-        NODE_ENV=production npm start
+        npm start
       "
     deploy:
       mode: replicated
