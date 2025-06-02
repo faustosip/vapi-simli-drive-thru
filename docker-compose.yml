@@ -3,9 +3,8 @@ version: "3.7"
 services:
 ## --------------------------- SOPHIA AI --------------------------- ##
   vapi-simli-drive-thru:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: node:18-alpine
+    working_dir: /app
     volumes:
       - sophia_data:/app/data ## Volumen para datos persistentes
     networks:
@@ -23,6 +22,20 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - HOSTNAME=0.0.0.0
+    command: >
+      sh -c "
+        echo '🚀 Iniciando VAPI Simli Drive-Thru...' &&
+        apk add --no-cache git curl wget &&
+        if [ ! -f package.json ]; then
+          echo '📦 Clonando repositorio y instalando dependencias...' &&
+          git clone https://github.com/faustosip/vapi-simli-drive-thru.git . &&
+          npm install &&
+          echo '🔨 Construyendo aplicación...' &&
+          npm run build
+        fi &&
+        echo '✅ Iniciando servidor en puerto 3000...' &&
+        npm start
+      "
     deploy:
       mode: replicated
       replicas: 1
@@ -40,6 +53,12 @@ services:
         - traefik.http.routers.sophia.service=sophia
         - traefik.http.routers.sophia.entrypoints=websecure
         - traefik.http.routers.sophia.tls.certresolver=letsencryptresolver
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
 ## --------------------------- SOPHIA AI --------------------------- ##
 
 volumes:
