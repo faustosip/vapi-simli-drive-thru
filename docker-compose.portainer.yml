@@ -1,0 +1,50 @@
+version: "3.7"
+
+services:
+## --------------------------- SOPHIA AI --------------------------- ##
+  vapi-simli-drive-thru:
+    image: faustosip/vapi-simli-drive-thru:latest ## Tu imagen en Docker Hub
+    volumes:
+      - sophia_data:/app/data ## Volumen para datos persistentes
+    networks:
+      - faustoparedesnet ## Nome da rede interna
+    environment:
+      ## VAPI Configuration
+      - NEXT_PUBLIC_VAPI_PUBLIC_KEY=${NEXT_PUBLIC_VAPI_PUBLIC_KEY}
+      - VAPI_PRIVATE_KEY=${VAPI_PRIVATE_KEY}
+      - NEXT_PUBLIC_VAPI_ASSISTANT_ID=${NEXT_PUBLIC_VAPI_ASSISTANT_ID}
+      ## Simli Configuration  
+      - NEXT_PUBLIC_SIMLI_API_KEY=${NEXT_PUBLIC_SIMLI_API_KEY}
+      - NEXT_PUBLIC_SIMLI_FACE_ID=${NEXT_PUBLIC_SIMLI_FACE_ID}
+      ## Server Configuration
+      - NEXT_PUBLIC_BASE_URL=https://sophia.faustoparedesia.com
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1024M
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.sophia.rule=Host(`sophia.faustoparedesia.com`) ## Url da aplicação
+        - traefik.http.services.sophia.loadBalancer.server.port=3000
+        - traefik.http.routers.sophia.service=sophia
+        - traefik.http.routers.sophia.entrypoints=websecure
+        - traefik.http.routers.sophia.tls.certresolver=letsencryptresolver
+## --------------------------- SOPHIA AI --------------------------- ##
+
+volumes:
+  sophia_data:
+    external: true
+
+networks:
+  faustoparedesnet: ## Nome da rede interna
+    external: true
+    name: faustoparedesnet ## Nome da rede interna
