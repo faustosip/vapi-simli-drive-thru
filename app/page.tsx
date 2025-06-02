@@ -1,10 +1,10 @@
-import dynamic from 'next/dynamic';
+import { dynamic as nextDynamic } from 'next/dynamic';
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic';
 
 // Import DriveThru component with SSR disabled
-const DriveThruClient = dynamic(() => import('@/components/DriveThruClient'), {
+const DriveThruClient = nextDynamic(() => import('@/components/DriveThruClient'), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 flex items-center justify-center">
