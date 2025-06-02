@@ -11,6 +11,15 @@ const nextConfig = {
     unoptimized: true,
   },
   
+  // DISABLE all static optimization
+  distDir: '.next',
+  generateEtags: false,
+  
+  // Force all pages to be dynamic
+  experimental: {
+    isrMemoryCacheSize: 0, // Disable ISR cache
+  },
+  
   // Environment variables validation
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
