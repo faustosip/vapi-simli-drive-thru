@@ -1,34 +1,55 @@
 'use client';
 
-// Force dynamic rendering to avoid SSR issues
-export const dynamic = 'force-dynamic';
-
-export default function GlobalError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
+export default function GlobalError({ error, reset }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-white mb-4">500</h1>
-        <h2 className="text-2xl font-semibold text-white mb-4">Error del servidor</h2>
-        <p className="text-white/80 mb-8">Algo salió mal. Intenta nuevamente.</p>
-        <button
-          onClick={reset}
-          className="bg-white text-orange-500 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors mr-4"
-        >
-          Intentar de nuevo
-        </button>
-        <a 
-          href="/" 
-          className="bg-white/20 text-white px-6 py-3 rounded-full font-semibold hover:bg-white/30 transition-colors"
-        >
-          Volver al inicio
-        </a>
-      </div>
-    </div>
+    <html>
+      <body>
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(45deg, #ff6b35, #f7931e)',
+          color: 'white',
+          fontFamily: 'system-ui',
+          margin: 0,
+          padding: 0
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{ fontSize: '4rem', margin: '0 0 1rem 0' }}>500</h1>
+            <h2 style={{ fontSize: '1.5rem', margin: '0 0 1rem 0' }}>Error del servidor</h2>
+            <button
+              onClick={reset}
+              style={{
+                padding: '12px 24px',
+                backgroundColor: 'white',
+                color: '#ff6b35',
+                border: 'none',
+                borderRadius: '25px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                marginRight: '10px'
+              }}
+            >
+              Intentar de nuevo
+            </button>
+            <a 
+              href="/" 
+              style={{
+                display: 'inline-block',
+                padding: '12px 24px',
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: '25px',
+                fontWeight: 'bold'
+              }}
+            >
+              Volver al inicio
+            </a>
+          </div>
+        </div>
+      </body>
+    </html>
   );
 }
