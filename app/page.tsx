@@ -1,5 +1,8 @@
 import dynamic from 'next/dynamic';
 
+// Force dynamic rendering to avoid SSR issues
+export const dynamic = 'force-dynamic';
+
 // Import DriveThru component with SSR disabled
 const DriveThruClient = dynamic(() => import('@/components/DriveThruClient'), {
   ssr: false,
