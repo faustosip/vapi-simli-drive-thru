@@ -3,10 +3,12 @@ version: "3.7"
 services:
 ## --------------------------- SOPHIA AI --------------------------- ##
   vapi-simli-drive-thru:
-    image: node:18-alpine
-    working_dir: /app
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: vapi-simli-drive-thru:latest
     volumes:
-      - sophia_data:/app
+      - sophia_data:/app/data  # For any persistent data if needed
     networks:
       - faustoparedesnet ## Nome da rede interna
     environment:
@@ -22,20 +24,12 @@ services:
       # Server Configuration
       - NEXT_PUBLIC_BASE_URL=https://sophia.faustoparedesia.com
       - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
       
-    command: >
-      sh -c "
-        echo '🚀 Starting VAPI Simli Drive-Thru Application...' &&
-        if [ ! -f package.json ]; then
-          echo '📦 First time setup - installing dependencies...' &&
-          apk add --no-cache git curl wget &&
-          git clone https://github.com/faustosip/vapi-simli-drive-thru.git . &&
-          npm install --legacy-peer-deps &&
-          npm run build
-        fi &&
-        echo '✅ Starting application on port 3000...' &&
-        npm start
-      "
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
@@ -54,11 +48,11 @@ services:
         - traefik.http.routers.sophia.entrypoints=websecure
         - traefik.http.routers.sophia.tls.certresolver=letsencryptresolver
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 180s
+      start_period: 60s
 ## --------------------------- SOPHIA AI --------------------------- ##
 
 volumes:
