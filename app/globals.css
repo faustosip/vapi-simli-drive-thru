@@ -1,0 +1,285 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom styles for the drive-thru app */
+.neon-text {
+  text-shadow: 
+    0 0 5px rgba(0, 255, 255, 0.8),
+    0 0 10px rgba(0, 255, 255, 0.8),
+    0 0 20px rgba(0, 255, 255, 0.8),
+    0 0 40px rgba(0, 255, 255, 0.8),
+    0 0 80px rgba(0, 255, 255, 0.5);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.glass-effect {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Enhanced responsive design */
+@media (max-width: 1024px) {
+  .lg\:col-span-3 {
+    grid-column: span 12 / span 12;
+  }
+  
+  .lg\:col-span-6 {
+    grid-column: span 12 / span 12;
+  }
+  
+  .lg\:col-span-12 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid.lg\:grid-cols-12 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .h-\[calc\(100vh-200px\)\] {
+    height: auto;
+    min-height: calc(100vh - 200px);
+  }
+}
+
+/* Sidebar styles */
+.menu-sidebar {
+  min-height: 400px;
+}
+
+@media (max-width: 1024px) {
+  .menu-sidebar {
+    min-height: 300px;
+    max-height: 50vh;
+  }
+}
+
+/* Custom scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.2);
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.4);
+}
+
+.scrollbar-thumb-cyan-500\/20::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.2);
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Loading animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Pulse animation for new items */
+@keyframes newItemPulse {
+  0% {
+    background-color: rgba(6, 182, 212, 0.1);
+    border-color: rgba(6, 182, 212, 0.6);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  }
+  50% {
+    background-color: rgba(6, 182, 212, 0.2);
+    border-color: rgba(6, 182, 212, 0.8);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+  }
+  100% {
+    background-color: rgba(6, 182, 212, 0.1);
+    border-color: rgba(6, 182, 212, 0.6);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  }
+}
+
+.new-item-pulse {
+  animation: newItemPulse 1s ease-in-out;
+}
+
+/* Tech-style logo animation */
+@keyframes sophiaGlow {
+  0%, 100% {
+    text-shadow: 
+      0 0 5px rgba(0, 255, 255, 0.8),
+      0 0 10px rgba(0, 255, 255, 0.8),
+      0 0 20px rgba(0, 255, 255, 0.8),
+      0 0 40px rgba(0, 255, 255, 0.6);
+  }
+  50% {
+    text-shadow: 
+      0 0 10px rgba(0, 255, 255, 1),
+      0 0 20px rgba(0, 255, 255, 1),
+      0 0 30px rgba(0, 255, 255, 1),
+      0 0 50px rgba(0, 255, 255, 0.8),
+      0 0 70px rgba(0, 255, 255, 0.6);
+  }
+}
+
+.sophia-glow {
+  animation: sophiaGlow 2s ease-in-out infinite;
+}
+
+/* Product cards enhancement */
+.product-card {
+  transition: all 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 255, 255, 0.1);
+}
+
+/* Menu improvements */
+.menu-item {
+  transition: all 0.3s ease;
+}
+
+.menu-item:hover {
+  transform: translateX(4px);
+}
+
+/* Avatar container improvements */
+.avatar-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.avatar-container:hover::before {
+  opacity: 1;
+}
+
+/* Enhanced button styles */
+.btn-primary {
+  background: linear-gradient(135deg, #00bcd4, #0097a7);
+  box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #00acc1, #00838f);
+  box-shadow: 0 6px 20px rgba(0, 188, 212, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Order panel enhancements */
+.order-panel {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+/* Welcome message animation */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.welcome-message {
+  animation: slideUpFade 0.5s ease-out;
+}
