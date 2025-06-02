@@ -11,6 +11,15 @@ const nextConfig = {
     unoptimized: true,
   },
   
+  // Disable static export to avoid SSR issues
+  trailingSlash: false,
+  
+  // Skip static optimization for pages with SSR issues
+  experimental: {
+    skipTrailingSlashRedirect: true,
+    skipMiddlewareUrlNormalize: true,
+  },
+  
   // Environment variables validation
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
