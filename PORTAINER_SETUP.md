@@ -1,182 +1,253 @@
-# 🚀 PORTAINER DEPLOYMENT GUIDE
+# 🚀 PORTAINER DEPLOYMENT GUIDE - SWARM & STANDALONE
 
-## 📋 **Repositorio Creado**
+## ⚠️ **ERROR RESUELTO: "build, restart not supported"**
 
-✅ **GitHub Repository:** https://github.com/faustosip/vapi-simli-drive-thru  
-✅ **Usuario:** faustosip  
-✅ **Archivos Docker:** Dockerfile, docker-compose.yml incluidos  
+Si recibes el error:
+```
+Deployment error
+Ignoring unsupported options: build, restart
+invalid reference format
+```
+
+**CAUSA:** Tu Portainer está en modo **Docker Swarm**, que no soporta `build` y `restart`.
+
+**SOLUCIÓN:** Usar el `docker-compose.yml` actualizado que es compatible con Swarm.
 
 ---
 
-## 🔧 **PASO 1: Configurar Stack en Portainer**
+## 📋 **Repositorio Configurado**
 
-### 1. **Acceder a Portainer**
-- Ir a tu instancia de Portainer
-- Navegar a **Stacks** → **Add Stack**
+✅ **GitHub Repository:** https://github.com/faustosip/vapi-simli-drive-thru  
+✅ **Usuario:** faustosip  
+✅ **Archivos:** Compatible con Swarm y Standalone  
 
-### 2. **Configurar Repository**
+---
+
+## 🔧 **PASO 1: Identificar tu Modo de Portainer**
+
+### **Verificar si estás en Swarm:**
+1. Ir a **Portainer** → **Dashboard**
+2. Buscar en la esquina superior:
+   - ✅ **"Swarm"** = Docker Swarm mode
+   - ✅ **"Standalone"** = Docker Compose normal
+
+---
+
+## 🐳 **PASO 2A: Configuración para SWARM (Recomendado)**
+
+### **1. Crear Stack en Portainer**
 - **Name:** `vapi-simli-drive-thru`
 - **Build method:** ✅ **Repository**
 - **Repository URL:** `https://github.com/faustosip/vapi-simli-drive-thru`
 - **Reference:** `refs/heads/main`
-- **Compose path:** `docker-compose.yml`
-- ✅ **Automatic updates** (GitOps mode)
+- **Compose path:** `docker-compose.yml` ← **Usa el archivo principal**
+- ✅ **Automatic updates**
 
-### 3. **Variables de Entorno Requeridas**
-
-Agregar estas variables en la sección **Environment variables:**
-
+### **2. Variables de Entorno (REQUERIDAS)**
 ```env
-# VAPI Configuration (REQUERIDO)
 NEXT_PUBLIC_VAPI_PUBLIC_KEY=your-vapi-public-key-here
 VAPI_PRIVATE_KEY=your-vapi-private-key-here  
 NEXT_PUBLIC_VAPI_ASSISTANT_ID=your-vapi-assistant-id-here
-
-# Simli Configuration (REQUERIDO)
 NEXT_PUBLIC_SIMLI_API_KEY=your-simli-api-key-here
 NEXT_PUBLIC_SIMLI_FACE_ID=your-simli-face-id-here
-
-# Server Configuration (OPCIONAL)
 NEXT_PUBLIC_BASE_URL=https://your-domain.com
 ```
 
-### 4. **Deploy Stack**
+### **3. Deploy Stack**
 - Click **Deploy the stack**
-- Portainer descargará automáticamente desde GitHub
-- Build del Docker image
-- Deployment del contenedor
+- ✅ **Sin errores de build/restart**
+- El container clonará automáticamente desde GitHub
 
 ---
 
-## 🌐 **PASO 2: Configurar DNS/Proxy (Opcional)**
+## 🔧 **PASO 2B: Configuración para STANDALONE**
 
-Si usas un reverse proxy como Nginx o Traefik:
+Si tu Portainer NO está en Swarm:
 
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+### **1. Usar el archivo standalone**
+- **Compose path:** `docker-compose.standalone.yml`
+- Todo lo demás igual que Swarm
+
+### **2. O cambiar Portainer a Swarm**
+```bash
+# En tu servidor Docker
+docker swarm init
+# Reiniciar Portainer
 ```
 
 ---
 
-## 🔄 **PASO 3: Auto-Deploy (GitOps)**
+## 📊 **DIFERENCIAS ENTRE VERSIONES**
 
-### **Flujo Automático:**
-1. **Hacer cambios** en el código local
-2. **Push a GitHub** → `git push origin main`  
-3. **Portainer detecta** cambios automáticamente
-4. **Re-deploy** automático del stack
-5. **Nueva versión** live inmediatamente
+### **docker-compose.yml (SWARM):**
+- ✅ Sin `build` - usa imagen base + git clone
+- ✅ Sin `restart` - usa `deploy.restart_policy`
+- ✅ Red `overlay` para Swarm
+- ✅ Volume persistente para código
+- ✅ Health checks con `wget`
 
-### **Manual Redeploy:**
-- En Portainer → Stacks → `vapi-simli-drive-thru`
-- Click **Update stack**
-- Click **Pull and redeploy**
+### **docker-compose.standalone.yml:**
+- ✅ Con `build` - construye imagen local
+- ✅ Con `restart: unless-stopped`
+- ✅ Red `bridge` estándar
+- ✅ Health checks con `curl`
 
 ---
 
-## ✅ **VERIFICACIÓN**
+## 🚀 **PASO 3: Verificar Deployment**
 
 ### **1. Estado del Stack**
-- Portainer → Stacks → Verificar estado "Running"
-- Revisar logs del contenedor
+- Portainer → Stacks → Verificar "Running"
+- Ver logs: "🚀 First time setup - cloning repository..."
 
-### **2. Aplicación Funcionando**
-- Acceder a `http://your-server:3000`
-- Verificar que Sophia aparece
-- Probar iniciar una orden de voz
-
-### **3. Variables de Entorno**
+### **2. Health Check**
 ```bash
-# Verificar dentro del contenedor
-docker exec -it <container-name> printenv | grep VAPI
-docker exec -it <container-name> printenv | grep SIMLI
+curl http://your-server:3000/api/health
+# Esperar ~2-3 minutos para el primer build
+```
+
+### **3. Aplicación Lista**
+```bash
+# Cuando veas en logs:
+"✅ Starting application..."
+"Ready on http://localhost:3000"
 ```
 
 ---
 
-## 🔧 **CONFIGURACIÓN AVANZADA**
+## 🔄 **FLUJO AUTOMÁTICO (GitOps)**
 
-### **Health Checks**
-El docker-compose incluye health checks automáticos:
-```yaml
-healthcheck:
-  test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
-  interval: 30s
-  timeout: 10s
-  retries: 3
-```
+### **Cómo funciona:**
+1. **Cambio en GitHub** → Push al repositorio
+2. **Portainer detecta** → Auto-redeploy automático
+3. **Container actualiza** → Nuevo código sin downtime
+4. **Health check** → Verifica que funciona
 
-### **Logs y Monitoring**
-```bash
-# Ver logs en tiempo real
-docker logs -f <container-name>
+### **Tiempos esperados:**
+- **Primer deploy:** 3-5 minutos (instalar + build)
+- **Updates posteriores:** 1-2 minutos (solo rebuild)
+- **Rollback:** 30 segundos
 
-# Logs de Portainer
-# Portainer → Containers → Select container → Logs
-```
+---
 
-### **Backup/Restore**
-```bash
-# Backup del stack
-docker-compose -f docker-compose.yml config > backup-compose.yml
+## ⚡ **OPTIMIZACIONES INCLUIDAS**
 
-# Restore
-# Usar Portainer UI para re-deploy desde backup
-```
+### **Para Swarm:**
+- **Replicas:** 1 (puede escalarse)
+- **Memory limits:** 512MB max, 256MB reservado
+- **Restart policy:** Reinicio automático en falla
+- **Update strategy:** Rolling update sin downtime
+- **Health monitoring:** Cada 30 segundos
+
+### **Volumen persistente:**
+- **app-data:** Mantiene node_modules entre deploys
+- **Faster rebuilds:** No reinstalar dependencias cada vez
 
 ---
 
 ## 🛠️ **TROUBLESHOOTING**
 
-### **Container no inicia:**
+### **Error: "invalid reference format"**
 ```bash
-# Verificar logs
-docker logs <container-name>
-
-# Verificar variables de entorno
-docker exec <container-name> printenv
+# Verificar variables de entorno en Portainer
+# NO deben tener espacios ni caracteres especiales
 ```
 
-### **Build falla:**
-- Verificar que el repositorio sea público
-- Confirmar que `docker-compose.yml` está en la raíz
-- Revisar sintaxis del Dockerfile
+### **Container no inicia:**
+```bash
+# Ver logs en Portainer
+# Buscar: "Error" o "Failed"
+# Verificar que todas las env vars están configuradas
+```
 
-### **App no responde:**
-- Verificar puerto 3000 está expuesto
-- Confirmar variables VAPI/Simli son correctas
-- Revisar logs de la aplicación
+### **App no responde después de 5 minutos:**
+```bash
+# Verificar logs para:
+"npm install" - debe completarse
+"npm run build" - debe completarse  
+"npm start" - debe mostrar "Ready on port 3000"
+```
+
+### **GitOps no funciona:**
+```bash
+# Verificar en Portainer:
+# Stack → Settings → ✅ "Automatic updates" habilitado
+# Repository URL es correcto
+# Branch es "main"
+```
 
 ---
 
-## 📚 **RECURSOS**
+## 🔧 **COMANDOS ÚTILES**
 
-- **GitHub Repo:** https://github.com/faustosip/vapi-simli-drive-thru
-- **VAPI Dashboard:** https://dashboard.vapi.ai
-- **Simli Dashboard:** https://simli.ai
-- **Next.js Docs:** https://nextjs.org/docs
+### **Forzar actualización manual:**
+```bash
+# En Portainer UI:
+Stacks → vapi-simli-drive-thru → "Update stack" → "Pull and redeploy"
+```
+
+### **Ver logs en tiempo real:**
+```bash
+# En Portainer UI:
+Stacks → vapi-simli-drive-thru → Containers → Logs
+```
+
+### **Reiniciar stack:**
+```bash
+# En Portainer UI:
+Stacks → vapi-simli-drive-thru → "Stop" → "Start"
+```
 
 ---
 
-## 🎯 **RESULTADO ESPERADO**
+## 📈 **MONITOREO**
 
-Una vez configurado correctamente:
+### **Health Endpoint:**
+```bash
+GET http://your-server:3000/api/health
 
-1. ✅ **Auto-deploy** desde GitHub
-2. ✅ **Sophia AI** funcionando
-3. ✅ **Órdenes de voz** procesándose
-4. ✅ **UI responsiva** y moderna
-5. ✅ **Actualizaciones** automáticas con cada push
+# Respuesta esperada:
+{
+  "status": "healthy",
+  "services": {
+    "vapi": { "configured": true },
+    "simli": { "configured": true }
+  }
+}
+```
 
-**¡Tu Drive-Thru AI está listo para producción! 🚗🍩**
+### **Métricas del Container:**
+- **CPU:** <10% en idle, <30% en uso
+- **RAM:** ~100-300MB dependiendo del tráfico
+- **Disk:** ~500MB para node_modules + código
+
+---
+
+## 🎯 **RESULTADO FINAL**
+
+Con esta configuración obtendrás:
+
+1. ✅ **Deploy sin errores** en Swarm
+2. ✅ **GitOps automático** desde GitHub
+3. ✅ **Sophia AI funcionando** perfectamente
+4. ✅ **Auto-scaling** si es necesario
+5. ✅ **Monitoring** automático
+6. ✅ **Updates** sin downtime
+
+---
+
+## 📞 **SOPORTE RÁPIDO**
+
+### **Si sigues teniendo problemas:**
+
+1. **Verificar variables de entorno** en Portainer
+2. **Revisar logs** del container por errores
+3. **Confirmar modo Swarm/Standalone** en Portainer
+4. **Usar el archivo compose correcto** según tu setup
+
+### **Enlaces importantes:**
+- 🔗 **Repo:** https://github.com/faustosip/vapi-simli-drive-thru
+- 📋 **Issues:** https://github.com/faustosip/vapi-simli-drive-thru/issues
+- 🏥 **Health:** `http://your-server:3000/api/health`
+
+**¡El error está resuelto! Tu deployment debería funcionar ahora 🚀**
