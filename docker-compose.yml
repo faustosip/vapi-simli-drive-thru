@@ -3,33 +3,24 @@ version: "3.7"
 services:
 ## --------------------------- SOPHIA AI --------------------------- ##
   vapi-simli-drive-thru:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    image: vapi-simli-drive-thru:latest
+    image: faustosip/vapi-simli-drive-thru:latest ## Imagen pre-construida
     volumes:
-      - sophia_data:/app/data  # For any persistent data if needed
+      - sophia_data:/app/data ## Volumen para datos persistentes
     networks:
       - faustoparedesnet ## Nome da rede interna
     environment:
-      # VAPI Configuration
+      ## VAPI Configuration
       - NEXT_PUBLIC_VAPI_PUBLIC_KEY=${NEXT_PUBLIC_VAPI_PUBLIC_KEY}
       - VAPI_PRIVATE_KEY=${VAPI_PRIVATE_KEY}
       - NEXT_PUBLIC_VAPI_ASSISTANT_ID=${NEXT_PUBLIC_VAPI_ASSISTANT_ID}
-      
-      # Simli Configuration  
+      ## Simli Configuration  
       - NEXT_PUBLIC_SIMLI_API_KEY=${NEXT_PUBLIC_SIMLI_API_KEY}
       - NEXT_PUBLIC_SIMLI_FACE_ID=${NEXT_PUBLIC_SIMLI_FACE_ID}
-      
-      # Server Configuration
+      ## Server Configuration
       - NEXT_PUBLIC_BASE_URL=https://sophia.faustoparedesia.com
       - NODE_ENV=production
       - PORT=3000
       - HOSTNAME=0.0.0.0
-      
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
@@ -47,12 +38,6 @@ services:
         - traefik.http.routers.sophia.service=sophia
         - traefik.http.routers.sophia.entrypoints=websecure
         - traefik.http.routers.sophia.tls.certresolver=letsencryptresolver
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
 ## --------------------------- SOPHIA AI --------------------------- ##
 
 volumes:
