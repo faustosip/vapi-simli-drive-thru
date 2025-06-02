@@ -1,16 +1,28 @@
-// Force dynamic rendering to avoid SSR issues
-export const dynamic = 'force-dynamic';
-
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-white mb-4">404</h1>
-        <h2 className="text-2xl font-semibold text-white mb-4">Página no encontrada</h2>
-        <p className="text-white/80 mb-8">La página que buscas no existe.</p>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(45deg, #ff6b35, #f7931e)',
+      color: 'white',
+      fontFamily: 'system-ui'
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <h1 style={{ fontSize: '4rem', margin: '0 0 1rem 0' }}>404</h1>
+        <h2 style={{ fontSize: '1.5rem', margin: '0 0 1rem 0' }}>Página no encontrada</h2>
         <a 
           href="/" 
-          className="bg-white text-orange-500 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+          style={{
+            display: 'inline-block',
+            padding: '12px 24px',
+            backgroundColor: 'white',
+            color: '#ff6b35',
+            textDecoration: 'none',
+            borderRadius: '25px',
+            fontWeight: 'bold'
+          }}
         >
           Volver al inicio
         </a>
