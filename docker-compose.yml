@@ -6,7 +6,7 @@ services:
     image: node:18-alpine
     working_dir: /app
     volumes:
-      - sophia_data:/app/data ## Volumen para datos persistentes
+      - sophia_data:/app ## Volumen para persistir código
     networks:
       - faustoparedesnet ## Nome da rede interna
     environment:
@@ -27,10 +27,21 @@ services:
         echo '🚀 Iniciando VAPI Simli Drive-Thru...' &&
         apk add --no-cache git curl wget &&
         if [ ! -f package.json ]; then
-          echo '📦 Clonando repositorio y instalando dependencias...' &&
-          git clone https://github.com/faustosip/vapi-simli-drive-thru.git . &&
+          echo '📦 Primera instalación - clonando repositorio...' &&
+          git clone https://github.com/faustosip/vapi-simli-drive-thru.git temp_repo &&
+          mv temp_repo/* . && mv temp_repo/.* . 2>/dev/null || true &&
+          rm -rf temp_repo &&
           npm install &&
           echo '🔨 Construyendo aplicación...' &&
+          npm run build
+        else
+          echo '🔄 Actualizando código existente...' &&
+          git config --global --add safe.directory /app &&
+          git fetch origin main &&
+          git reset --hard origin/main &&
+          echo '📦 Instalando dependencias...' &&
+          npm install &&
+          echo '🔨 Reconstruyendo aplicación...' &&
           npm run build
         fi &&
         echo '✅ Iniciando servidor en puerto 3000...' &&
@@ -58,7 +69,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 120s
+      start_period: 180s
 ## --------------------------- SOPHIA AI --------------------------- ##
 
 volumes:
