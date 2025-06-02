@@ -19,7 +19,7 @@ services:
       - NEXT_PUBLIC_SIMLI_FACE_ID=${NEXT_PUBLIC_SIMLI_FACE_ID}
       ## Server Configuration
       - NEXT_PUBLIC_BASE_URL=https://sophia.faustoparedesia.com
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=3000
       - HOSTNAME=0.0.0.0
     command: >
@@ -31,7 +31,8 @@ services:
           git clone https://github.com/faustosip/vapi-simli-drive-thru.git temp_repo &&
           mv temp_repo/* . && mv temp_repo/.* . 2>/dev/null || true &&
           rm -rf temp_repo &&
-          npm install &&
+          echo '📦 Instalando todas las dependencias...' &&
+          npm install --include=dev &&
           echo '🔨 Construyendo aplicación...' &&
           npm run build
         else
@@ -39,13 +40,13 @@ services:
           git config --global --add safe.directory /app &&
           git fetch origin main &&
           git reset --hard origin/main &&
-          echo '📦 Instalando dependencias...' &&
-          npm install &&
+          echo '📦 Instalando todas las dependencias...' &&
+          npm install --include=dev &&
           echo '🔨 Reconstruyendo aplicación...' &&
           npm run build
         fi &&
         echo '✅ Iniciando servidor en puerto 3000...' &&
-        npm start
+        NODE_ENV=production npm start
       "
     deploy:
       mode: replicated
