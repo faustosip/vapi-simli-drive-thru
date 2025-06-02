@@ -11,14 +11,6 @@ const nextConfig = {
     unoptimized: true,
   },
   
-  // DISABLE static page generation to avoid SSR errors
-  generateEtags: false,
-  
-  // Force dynamic rendering
-  experimental: {
-    forceSwcTransforms: true,
-  },
-  
   // Environment variables validation
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
