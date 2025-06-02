@@ -1,13 +1,14 @@
-version: '3.8'
+version: "3.7"
 
 services:
+## --------------------------- SOPHIA AI --------------------------- ##
   vapi-simli-drive-thru:
     image: node:18-alpine
     working_dir: /app
-    ports:
-      - target: 3000
-        published: 3000
-        mode: ingress
+    volumes:
+      - sophia_data:/app
+    networks:
+      - faustoparedesnet ## Nome da rede interna
     environment:
       # VAPI Configuration
       - NEXT_PUBLIC_VAPI_PUBLIC_KEY=${NEXT_PUBLIC_VAPI_PUBLIC_KEY}
@@ -19,11 +20,9 @@ services:
       - NEXT_PUBLIC_SIMLI_FACE_ID=${NEXT_PUBLIC_SIMLI_FACE_ID}
       
       # Server Configuration
-      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
+      - NEXT_PUBLIC_BASE_URL=https://sophia.faustoparedesia.com
       - NODE_ENV=production
       
-    volumes:
-      - app-data:/app
     command: >
       sh -c "
         echo '🚀 Starting VAPI Simli Drive-Thru Application...' &&
@@ -31,39 +30,42 @@ services:
           echo '📦 First time setup - installing dependencies...' &&
           apk add --no-cache git curl wget &&
           git clone https://github.com/faustosip/vapi-simli-drive-thru.git . &&
-          npm install &&
+          npm install --legacy-peer-deps &&
           npm run build
         fi &&
         echo '✅ Starting application on port 3000...' &&
         npm start
       "
     deploy:
+      mode: replicated
       replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 3
-        window: 60s
-      update_config:
-        parallelism: 1
-        delay: 10s
-        failure_action: rollback
-        order: start-first
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 256M
       placement:
         constraints:
           - node.role == manager
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1024M
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.sophia.rule=Host(`sophia.faustoparedesia.com`) ## Url da aplicação
+        - traefik.http.services.sophia.loadBalancer.server.port=3000
+        - traefik.http.routers.sophia.service=sophia
+        - traefik.http.routers.sophia.entrypoints=websecure
+        - traefik.http.routers.sophia.tls.certresolver=letsencryptresolver
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 120s
+      start_period: 180s
+## --------------------------- SOPHIA AI --------------------------- ##
 
 volumes:
-  app-data:
-    driver: local
+  sophia_data:
+    external: true
+
+networks:
+  faustoparedesnet: ## Nome da rede interna
+    external: true
+    name: faustoparedesnet ## Nome da rede interna
